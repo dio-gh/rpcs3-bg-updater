@@ -3,54 +3,46 @@ import subprocess
 import re
 import os
 
-LOCAL_COMMIT_HASH = '4a86638c'
+LOCAL_COMMIT = '4a86638c'
+SHORTHASH = r'[0-9a-fA-F]{8}'
 
-UPDATE_API_ENDPOINT = 'https://update.rpcs3.net'
-UPDATE_API_VERSION_ID = 'v2'
-
-def update_commit_hash(new_commit_hash):
-    with open(os.path.basename(__file__), 'r+') as script:
-        line = script.read()
-        line = re.sub(r"(LOCAL_COMMIT_HASH = )'[0-9a-fA-F]{8}'", f"\\1'{new_commit_hash}'", line)
-        script.seek(0)
-        script.write(line)
-        script.truncate()
+API_ENDPOINT = 'https://update.rpcs3.net'
+API_VERSION_ID = 'v2'
 
 os.chdir(os.path.dirname(__file__))
 
-# example url: https://update.rpcs3.net/?api=v2&c=42aa8f26
-api_response = requests.get(UPDATE_API_ENDPOINT, params={'api': UPDATE_API_VERSION_ID, 'c': LOCAL_COMMIT_HASH}).json()
+# example url: https://update.rpcs3.net/?api=v2&c=4a86638c
+api_response = requests.get(API_ENDPOINT, params={'api': API_VERSION_ID, 'c': LOCAL_COMMIT}).json()
 
-# 'return_code' is set to 1 if the client should retrieve the latest update, 0 otherwise
-if api_response["return_code"] > 0:
-    print("Update found!")
+# when the return_code is 1, the latest update shall be applied
+if api_response["return_code"] == 1:
 
-    # print version identifiers
-    print("Current version: " + api_response["current_build"]["version"])
-    print("Latest version: " + api_response["latest_build"]["version"])
-
-    print("Downloading update...")
-
+    # retrieve the update archive
     update_blob = requests.get(api_response["latest_build"]["windows"]["download"])
-    update_filename = re.findall('filename=(.+)', update_blob.headers.get('content-disposition'))[0]
-    open(update_filename, 'wb').write(update_blob.content)
+    update_fname = re.findall('filename=(.+)', update_blob.headers.get('content-disposition'))[0]
+    open(update_fname, 'wb').write(update_blob.content)
 
-    # 7z x -y -o"outdir" <filename>
+    # extract the update archive
     si = subprocess.STARTUPINFO()
     si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    extraction_proc = subprocess.Popen(['7z', 'x', '-y', update_filename], stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL, startupinfo=si, shell=True)
+    extraction_proc = subprocess.Popen(
+        ['7z', 'x', '-y', update_fname],
+        stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        startupinfo=si,
+        shell=True)
     extraction_status = extraction_proc.wait()
-    #extraction_status = os.system('7z x -y ' + update_filename)
-    os.remove(update_filename)
 
-    # update commit hash in the script if everything succeeded
+    # erase the update archive
+    os.remove(update_fname)
+
+    # update the local commit hash using the just retrieved update's filename if all went well
     if extraction_status == 0:
-        update_commit_hash(re.findall('[0-9a-fA-F]{8}', update_filename)[0])
-        print("Updating finished, exiting...")
-    else:
-        print("An error has occured while updating. Retrying later...")
-
-else:
-    print("No updates found!")
-    print("Version identifier: " + api_response["latest_build"]["version"])
-    print("Exiting...")
+        with open(os.path.basename(__file__), 'r+') as this_script:
+            updated_script = re.sub(
+                f"(LOCAL_COMMIT = )'{SHORTHASH}'",
+                f"\\1'{re.findall(SHORTHASH, update_fname)[0]}'",
+                this_script.read())
+            this_script.seek(0)
+            this_script.write(updated_script)
+            this_script.truncate()
