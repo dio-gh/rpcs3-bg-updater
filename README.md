@@ -6,7 +6,7 @@ I believe this to be superior to the currently inbuilt updating methods, as it's
 
 RPCS3 could also inject a task roughly like this automatically, but it's pretty annoying to do that, and kind of ugly. It's also ever so slightly more secure this way.
 
-# Requirements:
+# Requirements
 
 This script depends on both Python and the `requests` Python library being installed, as well as 7-zip (`7z`) being available on the PATH environment variable.
 
@@ -20,7 +20,7 @@ For installing the `requests` library using pip, a package manager included with
 pip install requests
 ```
 
-# Usage:
+# Usage
 
 ## On Windows:
 
