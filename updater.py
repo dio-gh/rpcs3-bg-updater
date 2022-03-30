@@ -4,7 +4,7 @@ import re
 import os
 
 LOCAL_COMMIT = '4a86638c'
-SHORTHASH = r'[0-9a-fA-F]{8}'
+SHORTHASH_PATTERN = r'[0-9a-fA-F]{8}'
 
 API_ENDPOINT = 'https://update.rpcs3.net'
 API_VERSION_ID = 'v2'
@@ -27,8 +27,6 @@ if api_response["return_code"] == 1:
     si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     extraction_proc = subprocess.Popen(
         ['7z', 'x', '-y', update_fname],
-        stderr=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
         startupinfo=si,
         shell=True)
     extraction_status = extraction_proc.wait()
@@ -40,8 +38,8 @@ if api_response["return_code"] == 1:
     if extraction_status == 0:
         with open(os.path.basename(__file__), 'r+') as this_script:
             updated_script = re.sub(
-                f"(LOCAL_COMMIT = )'{SHORTHASH}'",
-                f"\\1'{re.findall(SHORTHASH, update_fname)[0]}'",
+                f"(LOCAL_COMMIT = )'{SHORTHASH_PATTERN}'",
+                f"\\1'{re.findall(SHORTHASH_PATTERN, update_fname)[0]}'",
                 this_script.read())
             this_script.seek(0)
             this_script.write(updated_script)
