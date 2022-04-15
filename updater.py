@@ -1,7 +1,7 @@
 import requests as req
-import subprocess, re, os
+import subprocess, re, os, winreg
 
-LOCAL_COMMIT = '4a86638c'
+LOCAL_COMMIT = '21f744e2'
 SHORTHASH_PATTERN = r'[0-9a-fA-F]{8}'
 
 API_ENDPOINT = 'https://update.rpcs3.net'
@@ -10,9 +10,17 @@ API_VER = 'v2'
 # example url: https://update.rpcs3.net/?api=v2&c=4a86638c
 res = req.get(API_ENDPOINT, params={'api': API_VER, 'c': LOCAL_COMMIT}).json()
 
+# ensure correct working dir
+os.chdir(os.path.dirname(__file__))
+
+# set up path to 7-Zip
+reg_key = winreg.OpenKeyEx(winreg.HKEY_CURRENT_USER, r'Software\7-Zip')
+reg_val, regtype = winreg.QueryValueEx(reg_key, 'Path')
+winreg.CloseKey(reg_key)
+extractor = reg_val + "7z.exe"
+
 # when the return_code is 1, gotta update
 if res["return_code"] == 1:
-    os.chdir(os.path.dirname(__file__))    # ensure correct working dir
 
     # retrieve the update archive
     update_blob = req.get(res["latest_build"]["windows"]["download"])
@@ -24,7 +32,7 @@ if res["return_code"] == 1:
     si = subprocess.STARTUPINFO()
     si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     extraction_proc = subprocess.Popen(
-        ['7z', 'x', '-y', update_fname],
+        [extractor, 'x', '-y', update_fname],
         startupinfo=si,
         shell=True)
     extraction_status = extraction_proc.wait()

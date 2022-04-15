@@ -6,23 +6,26 @@ I believe this to be superior to the currently inbuilt updating methods, as it's
 
 RPCS3 could also inject a task roughly like this automatically, but it's pretty annoying to do that, and kind of ugly. It's also ever so slightly more secure this way.
 
-# Requirements
+## Requirements
 
-This script depends on both Python and the `requests` Python library being installed, as well as 7-zip (`7z`) being available on the PATH environment variable.
+This script depends on both 7-Zip and Python being installed, as well as the `requests` Python library.
 
 For installing 7-zip on your system, see [here.](https://www.7-zip.org/download.html)
 
 For installing Python on your system, see [here.](https://www.python.org/downloads/)
 
-For installing the `requests` library using pip, a package manager included with Python:
+For installing the `requests` Python library, open the command line, and issue:
 
 ```
 pip install requests
 ```
 
-# Usage
+## Usage
 
-## On Windows:
+### On Windows systems
+
+<details>
+<summary>Click here to expand...</summary>
 
 1. Download the script from GitHub by
    * visiting the script file (`updater.py`) in the repository,
@@ -38,7 +41,7 @@ pip install requests
    * on the `Triggers` tab, add a new trigger:
      * for `Begin the task`, select `On Schedule`
      * for frequency, select `One time` (confusing, I know)
-     * check the `Repeat task every:` checkbox, and set it to your liking (I use 5 mins)
+     * check the `Repeat task every:` checkbox, and set it to your liking (I use 15 mins)
      * at the `for a duration of:` drop-down, select `Indefinitely`
      * click `OK` to save it
    * on the `Actions` tab, add a new action:
@@ -57,14 +60,14 @@ pip install requests
 
 If you've done everything correctly, you'll no longer be prompted to update RPCS3 on startup, nor will it forcefully update on every launch. Instead, the emulator will be kept up-to-date by this script, periodically polling for updates, and applying them as they come, seamlessly.
 
-## On Unix:
+</details>
 
-The script won't work on Unix-like systems right now. Wouldn't take much to fix it, but I have no desire to. PRs welcome, though this way of manhandling the lifecycle management is a very Windows problem, so I can't imagine there to be much interest to replicate it for AppImages.
+### On Unix systems
 
-# Notes and limitations
+The script won't work on Unix-like systems right now. Wouldn't take much to fix it, but I have no desire to. This way of manhandling the lifecycle management is a very Windows problem, so I can't imagine there to be much interest to replicate it for AppImages.
+
+## Notes and limitations
 
 This script will only work as long as the specific version (`v2`) of their update API endpoint does, but that seems to be stable, so should be fine for quite some time.
 
-The script also utilizes the `shell=True` flag when invoking 7-zip via `subprocess.Popen()`, which has security implications. Too bad I haven't bothered to read up on those, eh?
-
-Oh yeah, there's basically no error checking either - if something fails, it doesn't matter much, since it's periodically re-tried anyways. Shouldn't trash the storage at the very least... I think.
+The script also utilizes the `shell=True` flag when invoking 7-zip via `subprocess.Popen()`, which has security implications, but should be fine also.
