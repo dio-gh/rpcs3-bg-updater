@@ -8,9 +8,9 @@ RPCS3 could also inject a task roughly like this automatically, but it's pretty 
 
 ## Requirements
 
-This script depends on both 7-Zip and Python being installed, as well as the `requests` Python library.
+This script depends on both 7-Zip and Python being installed, along with the `requests` Python library.
 
-For installing 7-zip on your system, see [here.](https://www.7-zip.org/download.html)
+For installing 7-Zip on your system, see [here.](https://www.7-zip.org/download.html)
 
 For installing Python on your system, see [here.](https://www.python.org/downloads/)
 
