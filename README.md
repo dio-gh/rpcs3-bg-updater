@@ -69,5 +69,3 @@ The script won't work on Unix-like systems right now. Wouldn't take much to fix 
 ## Notes and limitations
 
 This script will only work as long as the specific version (`v2`) of their update API endpoint does, but that seems to be stable, so should be fine for quite some time.
-
-The script also utilizes the `shell=True` flag when invoking 7-zip via `subprocess.Popen()`, which has security implications, but should be fine also.

@@ -33,8 +33,7 @@ if res["return_code"] == 1:
     si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
     extraction_proc = subprocess.Popen(
         [extractor, 'x', '-y', update_fname],
-        startupinfo=si,
-        shell=True)
+        startupinfo=si)
     extraction_status = extraction_proc.wait()
 
     # erase the update archive
